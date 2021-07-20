@@ -1,15 +1,17 @@
 provider "aws" {
   region = "us-east-2"
 }
-resource "aws_instance" "BBG-test2" {
-  ami = "ami-0ba62214afa52bec7"
-  instance_type = "t2.micro"
-  vpc_security_group_ids = [ "sg-0783ee013eb20f7c4" ]
-  key_name = "test-19-07"
-  tags = {
-    Name = "berenberg-and-eci-rock-SITIKANTHA"
-  }
+
+module "network" {
+  source = "./modules/network"
+  availability_zone = "us-east-2b"
+  vpc_name = "BBG-VPC1"
+  vpc_subnet_name= "BBG-SUBNET1"
 }
-output "instance_ips" {
-  value = aws_instance.BBG-test2.public_ip
+
+module "compute" {
+  source = "./modules/compute"
+  instance_name = "bbg-and-eci-rock-SITIKANTHA"
+  subnet_id = "${module.network.subnet_id}" 
+  sg_id = "${module.network.sg_id}"
 }
